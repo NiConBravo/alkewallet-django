@@ -3,26 +3,19 @@
 {% block title %}Dashboard — Alke Wallet{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12 mb-4">
+<div class="row mb-4">
+    <div class="col-12">
         <h2 class="fw-bold">Dashboard</h2>
         <p class="text-muted">Resumen de tu cuenta</p>
     </div>
 </div>
 
-<div class="row g-4">
+<div class="row g-4 mb-4">
     <div class="col-md-6">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-wallet2 fs-2 text-dark me-3"></i>
-                    <div>
-                        <p class="text-muted mb-0 small">Saldo disponible</p>
-                        <h3 class="fw-bold mb-0">
-                            {{ wallet.currency }} {{ wallet.balance }}
-                        </h3>
-                    </div>
-                </div>
+                <p class="text-muted small mb-1">Saldo disponible</p>
+                <h3 class="fw-bold">{{ wallet.currency }} {{ wallet.balance }}</h3>
                 <p class="text-muted small mb-0">
                     <i class="bi bi-calendar3"></i>
                     Cuenta creada el {{ wallet.created_at|date:"d/m/Y" }}
@@ -32,19 +25,52 @@
     </div>
 
     <div class="col-md-6">
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 h-100">
             <div class="card-body p-4">
-                <p class="text-muted mb-2 small">Acciones rápidas</p>
+                <p class="text-muted small mb-2">Acciones rápidas</p>
                 <div class="d-grid gap-2">
                     <a href="{% url 'transaction_create' %}" class="btn btn-dark">
                         <i class="bi bi-plus-circle"></i> Nueva transacción
                     </a>
                     <a href="{% url 'transaction_list' %}" class="btn btn-outline-dark">
-                        <i class="bi bi-list-ul"></i> Ver historial
+                        <i class="bi bi-list-ul"></i> Ver historial completo
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% if recent_transactions %}
+<div class="row">
+    <div class="col-12">
+        <h5 class="fw-bold mb-3">Últimas transacciones</h5>
+        <div class="card shadow-sm border-0">
+            <div class="list-group list-group-flush">
+                {% for transaction in recent_transactions %}
+                <a href="{% url 'transaction_detail' transaction.pk %}"
+                    class="list-group-item list-group-item-action px-4 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if transaction.transaction_type == 'deposit' %}
+                            <span class="badge bg-success me-2">Depósito</span>
+                            {% elif transaction.transaction_type == 'withdrawal' %}
+                            <span class="badge bg-danger me-2">Retiro</span>
+                            {% else %}
+                            <span class="badge bg-primary me-2">Transferencia</span>
+                            {% endif %}
+                            <span class="text-muted small">
+                                {{ transaction.created_at|date:"d/m/Y H:i" }}
+                            </span>
+                        </div>
+                        <span class="fw-bold">{{ wallet.currency }} {{ transaction.amount }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

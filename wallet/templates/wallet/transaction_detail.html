@@ -1,0 +1,62 @@
+{% extends 'wallet/base.html' %}
+
+{% block title %}Detalle — Alke Wallet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'transaction_list' %}" class="btn btn-outline-dark btn-sm me-3">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <h2 class="fw-bold mb-0">Detalle de transacción</h2>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+
+                <div class="mb-3">
+                    <p class="text-muted small mb-1">Tipo</p>
+                    {% if transaction.transaction_type == 'deposit' %}
+                    <span class="badge bg-success fs-6">Depósito</span>
+                    {% elif transaction.transaction_type == 'withdrawal' %}
+                    <span class="badge bg-danger fs-6">Retiro</span>
+                    {% else %}
+                    <span class="badge bg-primary fs-6">Transferencia</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <p class="text-muted small mb-1">Monto</p>
+                    <p class="fw-bold fs-4 mb-0">
+                        {{ transaction.wallet.currency }} {{ transaction.amount }}
+                    </p>
+                </div>
+
+                <div class="mb-3">
+                    <p class="text-muted small mb-1">Fecha</p>
+                    <p class="mb-0">{{ transaction.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+
+                {% if transaction.description %}
+                <div class="mb-4">
+                    <p class="text-muted small mb-1">Descripción</p>
+                    <p class="mb-0">{{ transaction.description }}</p>
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-2 mt-4">
+                    <a href="{% url 'transaction_edit' transaction.pk %}" class="btn btn-dark">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="{% url 'transaction_delete' transaction.pk %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
