@@ -18,6 +18,11 @@
                 <form method="POST">
                     {% csrf_token %}
 
+                    <div class="alert alert-light border mb-4">
+                        <i class="bi bi-wallet2 me-2"></i>
+                        Moneda de tu wallet: <strong>{{ request.user.wallet.currency }}</strong>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Monto</label>
                         {{ form.amount }}

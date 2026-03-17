@@ -34,9 +34,9 @@ class Wallet(models.Model):
 class Transaction(models.Model):
     
     TRANSACTION_TYPES = [
-        ('deposit', 'Deposit'),
-        ('withdrawal', 'Withdrawal'),
-        ('transfer', 'Transfer'),
+        ('deposit', 'Depósito'),
+        ('withdrawal', 'Retiro'),
+        ('transfer', 'Transferencia'),
     ]
 
     wallet = models.ForeignKey( #Una wallet puede tener muchas transacciones
