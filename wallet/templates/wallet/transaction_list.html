@@ -4,14 +4,60 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold mb-0">Historial de transacciones</h2>
-        <p class="text-muted">{{ wallet.currency }} {{ wallet.balance }} disponible</p>
+    <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div>
+            <h2 class="fw-bold mb-0">Historial de transacciones</h2>
+            <p class="text-muted mb-0">{{ wallet.currency }} {{ wallet.balance }} disponible</p>
+        </div>
     </div>
     <a href="{% url 'transaction_create' %}" class="btn btn-dark">
         <i class="bi bi-plus-circle"></i> Nueva transacción
     </a>
 </div>
+
+{# Formulario de filtros #}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-3 align-items-end">
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Tipo</label>
+                <select name="type" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="deposit" {{ selected_deposit }}>Depósito</option>
+                    <option value="withdrawal" {{ selected_withdrawal }}>Retiro</option>
+                    <option value="transfer" {{ selected_transfer }}>Transferencia</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Fecha</label>
+                <input type="date" name="date" class="form-control" value="{{ filter_date }}">
+            </div>
+
+            <div class="col-md-4 d-flex gap-2">
+                <button type="submit" class="btn btn-dark w-100">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+                {% if filter_type or filter_date %}
+                <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-x-circle"></i> Limpiar
+                </a>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% if filter_type or filter_date %}
+<p class="text-muted small mb-3">
+    <i class="bi bi-funnel-fill"></i>
+    Mostrando {{ transactions|length }} resultado{{ transactions|length|pluralize:",s" }}
+</p>
+{% endif %}
 
 {% if transactions %}
 <div class="card shadow-sm border-0">
@@ -46,10 +92,23 @@
 {% else %}
 <div class="text-center py-5">
     <i class="bi bi-inbox fs-1 text-muted"></i>
-    <p class="text-muted mt-3">Aún no tienes transacciones registradas.</p>
+    <p class="text-muted mt-3">
+        {% if filter_type or filter_date %}
+        No hay transacciones que coincidan con los filtros.
+        {% else %}
+        Aún no tienes transacciones registradas.
+        {% endif %}
+    </p>
+    {% if filter_type or filter_date %}
+    <a href="{% url 'transaction_list' %}" class="btn btn-outline-dark">
+        <i class="bi bi-x-circle"></i> Limpiar filtros
+    </a>
+    {% else %}
     <a href="{% url 'transaction_create' %}" class="btn btn-dark">
         <i class="bi bi-plus-circle"></i> Crear primera transacción
     </a>
+    {% endif %}
 </div>
 {% endif %}
+
 {% endblock %}

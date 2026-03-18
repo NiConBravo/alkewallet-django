@@ -71,11 +71,25 @@ def dashboard_view(request):
 def transaction_list_view(request):
     wallet = request.user.wallet
     transactions = wallet.transactions.all()
+
+    filter_type = request.GET.get('type', '')
+    filter_date = request.GET.get('date', '')
+
+    if filter_type:
+        transactions = transactions.filter(transaction_type=filter_type)
+
+    if filter_date:
+        transactions = transactions.filter(created_at__date=filter_date)
+
     return render(request, 'wallet/transaction_list.html', {
         'transactions': transactions,
         'wallet': wallet,
+        'filter_type': filter_type,
+        'filter_date': filter_date,
+        'selected_deposit': 'selected' if filter_type == 'deposit' else '',
+        'selected_withdrawal': 'selected' if filter_type == 'withdrawal' else '',
+        'selected_transfer': 'selected' if filter_type == 'transfer' else '',
     })
-
 
 @login_required(login_url='login')
 def transaction_detail_view(request, pk):
