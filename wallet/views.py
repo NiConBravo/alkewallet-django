@@ -70,7 +70,7 @@ def dashboard_view(request):
 @login_required(login_url='login')
 def transaction_list_view(request):
     wallet = request.user.wallet
-    transactions = wallet.transactions.all()
+    transactions = wallet.transactions.select_related('wallet').all()
 
     filter_type = request.GET.get('type', '')
     filter_date = request.GET.get('date', '')
@@ -91,9 +91,14 @@ def transaction_list_view(request):
         'selected_transfer': 'selected' if filter_type == 'transfer' else '',
     })
 
+
 @login_required(login_url='login')
 def transaction_detail_view(request, pk):
-    transaction = get_object_or_404(Transaction, pk=pk, wallet=request.user.wallet)
+    transaction = get_object_or_404(
+        Transaction.objects.select_related('wallet'),
+        pk=pk,
+        wallet=request.user.wallet
+    )
     return render(request, 'wallet/transaction_detail.html', {
         'transaction': transaction,
     })
@@ -123,30 +128,12 @@ def transaction_create_view(request):
 
 
 @login_required(login_url='login')
-def transaction_edit_view(request, pk):
-    transaction = get_object_or_404(Transaction, pk=pk, wallet=request.user.wallet)
-
-    if request.method == 'POST':
-        form = TransactionForm(request.POST, instance=transaction)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Transacción actualizada correctamente.')
-            return redirect('transaction_detail', pk=transaction.pk)
-        else:
-            messages.error(request, 'Por favor corrige los errores del formulario.')
-    else:
-        form = TransactionForm(instance=transaction)
-
-    return render(request, 'wallet/transaction_form.html', {
-        'form': form,
-        'action': 'Editar',
-        'transaction': transaction,
-    })
-
-
-@login_required(login_url='login')
 def transaction_delete_view(request, pk):
-    transaction = get_object_or_404(Transaction, pk=pk, wallet=request.user.wallet)
+    transaction = get_object_or_404(
+        Transaction.objects.select_related('wallet'),
+        pk=pk,
+        wallet=request.user.wallet
+    )
 
     if request.method == 'POST':
         transaction.delete()
